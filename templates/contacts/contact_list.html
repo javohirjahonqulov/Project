@@ -2,71 +2,181 @@
 
 {% block title %}Contacts - CRM System{% endblock %}
 
+{% block breadcrumb %}Contacts{% endblock %}
+
 {% block content %}
-<div class="container mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">Contacts</h1>
-        <a href="{% url 'contact_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md">
+<div class="container mx-auto space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Contacts</h1>
+            <p class="text-gray-600 mt-1">Manage your customer relationships and contact information</p>
+        </div>
+        <a href="{% url 'contact_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
             <i class="fas fa-plus mr-2"></i> Add Contact
         </a>
     </div>
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="p-4 border-b">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
             <div class="flex items-center">
-                <div class="relative flex-grow">
-                    <input type="text" id="search" placeholder="Search contacts..." class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-users text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Total Contacts</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ contacts.count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-user-check text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Active</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ active_contacts|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-building text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Companies</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ unique_companies|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-calendar-plus text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">This Month</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ new_this_month|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <div class="flex-1">
+                <div class="relative">
+                    <input type="text" id="search" placeholder="Search contacts by name, email, or company..."
+                           class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
                 </div>
-                <div class="ml-4">
-                    <select id="filter" class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Sources</option>
-                        <option value="website">Website</option>
-                        <option value="referral">Referral</option>
-                        <option value="social_media">Social Media</option>
-                        <option value="email">Email Campaign</option>
-                        <option value="other">Other</option>
-                    </select>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <select id="sourceFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <option value="">All Sources</option>
+                    <option value="website">Website</option>
+                    <option value="referral">Referral</option>
+                    <option value="social_media">Social Media</option>
+                    <option value="email">Email Campaign</option>
+                    <option value="other">Other</option>
+                </select>
+                <select id="statusFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="prospect">Prospect</option>
+                </select>
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center">
+                    <i class="fas fa-download mr-2"></i> Export
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacts Grid/List -->
+    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">All Contacts</h2>
+                <div class="flex items-center space-x-2">
+                    <button id="gridView" class="p-2 text-gray-400 hover:text-primary-500 transition-colors">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button id="listView" class="p-2 text-primary-500">
+                        <i class="fas fa-list"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
         {% if contacts %}
-            <div class="overflow-x-auto">
+            <!-- List View -->
+            <div id="listViewContent" class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         {% for contact in contacts %}
-                            <tr>
+                            <tr class="hover:bg-gray-50 transition-colors duration-200 contact-row"
+                                data-name="{{ contact.first_name }} {{ contact.last_name }}"
+                                data-email="{{ contact.email }}"
+                                data-company="{{ contact.company|default:'' }}"
+                                data-source="{{ contact.source }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
-                                            {{ contact.first_name|first|upper }}{{ contact.last_name|first|upper }}
-                                        </div>
+                                        {% if contact.profile_image %}
+                                            <img class="h-12 w-12 rounded-full object-cover shadow-md"
+                                                 src="{{ contact.profile_image.url }}"
+                                                 alt="{{ contact.first_name }} {{ contact.last_name }}">
+                                        {% else %}
+                                            <div class="h-12 w-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-semibold shadow-md">
+                                                {{ contact.first_name|first|upper }}{{ contact.last_name|first|upper }}
+                                            </div>
+                                        {% endif %}
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900">
-                                                <a href="{% url 'contact_detail' contact.id %}">{{ contact.first_name }} {{ contact.last_name }}</a>
+                                                <a href="{% url 'contact_detail' contact.id %}" class="hover:text-primary-600 transition-colors">
+                                                    {{ contact.first_name }} {{ contact.last_name }}
+                                                </a>
                                             </div>
-                                            <div class="text-sm text-gray-500">{{ contact.position }}</div>
+                                            <div class="text-sm text-gray-500">{{ contact.position|default:"No position" }}</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ contact.email }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ contact.phone|default:"-" }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ contact.company|default:"-" }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    <div class="text-sm text-gray-900">{{ contact.email }}</div>
+                                    <div class="text-sm text-gray-500">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                            {% if contact.status == 'active' %}bg-green-100 text-green-800
+                                            {% elif contact.status == 'inactive' %}bg-red-100 text-red-800
+                                            {% else %}bg-yellow-100 text-yellow-800
+                                            {% endif %}">
+                                            {{ contact.get_status_display|default:"Active" }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ contact.phone|default:"-" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ contact.company|default:"-" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
                                         {% if contact.source == 'website' %}bg-blue-100 text-blue-800
                                         {% elif contact.source == 'referral' %}bg-green-100 text-green-800
                                         {% elif contact.source == 'social_media' %}bg-purple-100 text-purple-800
@@ -77,24 +187,114 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{% url 'contact_detail' contact.id %}" class="text-blue-600 hover:text-blue-900 mr-3">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{% url 'contact_update' contact.id %}" class="text-yellow-600 hover:text-yellow-900 mr-3">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{% url 'contact_delete' contact.id %}" class="text-red-600 hover:text-red-900">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{% url 'contact_detail' contact.id %}"
+                                           class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+                                           title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'contact_update' contact.id %}"
+                                           class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
+                                           title="Edit Contact">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'contact_delete' contact.id %}"
+                                           class="p-2 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors"
+                                           title="Delete Contact">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+
+            <!-- Grid View -->
+            <div id="gridViewContent" class="p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {% for contact in contacts %}
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 contact-card"
+                             data-name="{{ contact.first_name }} {{ contact.last_name }}"
+                             data-email="{{ contact.email }}"
+                             data-company="{{ contact.company|default:'' }}"
+                             data-source="{{ contact.source }}">
+                            <div class="text-center">
+                                {% if contact.profile_image %}
+                                    <img class="h-16 w-16 rounded-full object-cover mx-auto shadow-md"
+                                         src="{{ contact.profile_image.url }}"
+                                         alt="{{ contact.first_name }} {{ contact.last_name }}">
+                                {% else %}
+                                    <div class="h-16 w-16 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xl mx-auto shadow-md">
+                                        {{ contact.first_name|first|upper }}{{ contact.last_name|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <h3 class="mt-4 text-lg font-semibold text-gray-900">
+                                    <a href="{% url 'contact_detail' contact.id %}" class="hover:text-primary-600 transition-colors">
+                                        {{ contact.first_name }} {{ contact.last_name }}
+                                    </a>
+                                </h3>
+                                <p class="text-sm text-gray-500">{{ contact.position|default:"No position" }}</p>
+                                <p class="text-sm text-gray-600 mt-1">{{ contact.company|default:"No company" }}</p>
+
+                                <div class="mt-4 space-y-2">
+                                    <div class="flex items-center justify-center text-sm text-gray-500">
+                                        <i class="fas fa-envelope mr-2"></i>
+                                        <span class="truncate">{{ contact.email }}</span>
+                                    </div>
+                                    {% if contact.phone %}
+                                        <div class="flex items-center justify-center text-sm text-gray-500">
+                                            <i class="fas fa-phone mr-2"></i>
+                                            <span>{{ contact.phone }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mt-4 flex items-center justify-center">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                        {% if contact.source == 'website' %}bg-blue-100 text-blue-800
+                                        {% elif contact.source == 'referral' %}bg-green-100 text-green-800
+                                        {% elif contact.source == 'social_media' %}bg-purple-100 text-purple-800
+                                        {% elif contact.source == 'email' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-gray-100 text-gray-800
+                                        {% endif %}">
+                                        {{ contact.get_source_display }}
+                                    </span>
+                                </div>
+
+                                <div class="mt-4 flex items-center justify-center space-x-2">
+                                    <a href="{% url 'contact_detail' contact.id %}"
+                                       class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+                                       title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'contact_update' contact.id %}"
+                                       class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
+                                       title="Edit Contact">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'contact_delete' contact.id %}"
+                                       class="p-2 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors"
+                                       title="Delete Contact">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         {% else %}
-            <div class="p-6 text-center">
-                <p class="text-gray-500">No contacts found. <a href="{% url 'contact_create' %}" class="text-blue-600 hover:underline">Add your first contact</a>.</p>
+            <div class="p-12 text-center">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-users text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No contacts found</h3>
+                <p class="text-gray-500 mb-6">Get started by adding your first contact to the system.</p>
+                <a href="{% url 'contact_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-plus mr-2"></i> Add Your First Contact
+                </a>
             </div>
         {% endif %}
     </div>
@@ -103,36 +303,86 @@
 
 {% block extra_js %}
 <script>
-    // Simple client-side filtering
+document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search');
-    const filterSelect = document.getElementById('filter');
-    const tableRows = document.querySelectorAll('tbody tr');
+    const sourceFilter = document.getElementById('sourceFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const gridViewBtn = document.getElementById('gridView');
+    const listViewBtn = document.getElementById('listView');
+    const gridViewContent = document.getElementById('gridViewContent');
+    const listViewContent = document.getElementById('listViewContent');
 
-    function filterTable() {
+    // View toggle functionality
+    gridViewBtn.addEventListener('click', function() {
+        gridViewContent.classList.remove('hidden');
+        listViewContent.classList.add('hidden');
+        gridViewBtn.classList.add('text-primary-500');
+        gridViewBtn.classList.remove('text-gray-400');
+        listViewBtn.classList.add('text-gray-400');
+        listViewBtn.classList.remove('text-primary-500');
+    });
+
+    listViewBtn.addEventListener('click', function() {
+        listViewContent.classList.remove('hidden');
+        gridViewContent.classList.add('hidden');
+        listViewBtn.classList.add('text-primary-500');
+        listViewBtn.classList.remove('text-gray-400');
+        gridViewBtn.classList.add('text-gray-400');
+        gridViewBtn.classList.remove('text-primary-500');
+    });
+
+    // Filter functionality
+    function filterContacts() {
         const searchTerm = searchInput.value.toLowerCase();
-        const filterValue = filterSelect.value.toLowerCase();
+        const sourceValue = sourceFilter.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
 
+        // Filter table rows
+        const tableRows = document.querySelectorAll('.contact-row');
         tableRows.forEach(row => {
-            const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-            const email = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-            const company = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-            const source = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+            const name = row.dataset.name.toLowerCase();
+            const email = row.dataset.email.toLowerCase();
+            const company = row.dataset.company.toLowerCase();
+            const source = row.dataset.source.toLowerCase();
 
             const matchesSearch = name.includes(searchTerm) ||
                                  email.includes(searchTerm) ||
                                  company.includes(searchTerm);
 
-            const matchesFilter = filterValue === '' || source.includes(filterValue);
+            const matchesSource = sourceValue === '' || source.includes(sourceValue);
 
-            if (matchesSearch && matchesFilter) {
+            if (matchesSearch && matchesSource) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
             }
         });
+
+        // Filter grid cards
+        const gridCards = document.querySelectorAll('.contact-card');
+        gridCards.forEach(card => {
+            const name = card.dataset.name.toLowerCase();
+            const email = card.dataset.email.toLowerCase();
+            const company = card.dataset.company.toLowerCase();
+            const source = card.dataset.source.toLowerCase();
+
+            const matchesSearch = name.includes(searchTerm) ||
+                                 email.includes(searchTerm) ||
+                                 company.includes(searchTerm);
+
+            const matchesSource = sourceValue === '' || source.includes(sourceValue);
+
+            if (matchesSearch && matchesSource) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     }
 
-    searchInput.addEventListener('input', filterTable);
-    filterSelect.addEventListener('change', filterTable);
+    searchInput.addEventListener('input', filterContacts);
+    sourceFilter.addEventListener('change', filterContacts);
+    statusFilter.addEventListener('change', filterContacts);
+});
 </script>
 {% endblock %}

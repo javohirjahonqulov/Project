@@ -2,312 +2,543 @@
 
 {% block title %}Tasks - CRM System{% endblock %}
 
+{% block breadcrumb %}Tasks{% endblock %}
+
 {% block content %}
-<div class="container mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">Tasks</h1>
-        <a href="{% url 'task_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md">
-            <i class="fas fa-plus mr-2"></i> Add Task
-        </a>
+<div class="container mx-auto space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Tasks</h1>
+            <p class="text-gray-600 mt-1">Manage and track your activities</p>
+        </div>
+        <div class="flex space-x-3">
+            <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                <i class="fas fa-download mr-2"></i> Export
+            </button>
+            <a href="{% url 'task_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <i class="fas fa-plus mr-2"></i> Add Task
+            </a>
+        </div>
     </div>
-    
-    <div class="bg-white shadow-md rounded-lg overflow-hidden mb-6">
-        <div class="p-4 border-b">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="relative flex-grow">
-                    <input type="text" id="search" placeholder="Search tasks..." class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-tasks text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Total Tasks</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_tasks|default:"0" }}</p>
+                    <p class="text-xs text-purple-600 flex items-center mt-1">
+                        <i class="fas fa-chart-line mr-1"></i> All time
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-red-400 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-exclamation-circle text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Overdue</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ overdue_tasks|length|default:"0" }}</p>
+                    <p class="text-xs text-red-600 flex items-center mt-1">
+                        <i class="fas fa-clock mr-1"></i> Need attention
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-calendar-day text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Upcoming</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ upcoming_tasks|length|default:"0" }}</p>
+                    <p class="text-xs text-blue-600 flex items-center mt-1">
+                        <i class="fas fa-calendar-alt mr-1"></i> Next 7 days
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-check-circle text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Completed</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ completed_tasks|length|default:"0" }}</p>
+                    <p class="text-xs text-green-600 flex items-center mt-1">
+                        <i class="fas fa-trophy mr-1"></i> This month
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <div class="flex-1">
+                <div class="relative">
+                    <input type="text" id="search" placeholder="Search tasks by title or description..."
+                           class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <select id="status-filter" class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Statuses</option>
-                        <option value="not_started" {% if status_filter == 'not_started' %}selected{% endif %}>Not Started</option>
-                        <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
-                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
-                        <option value="deferred" {% if status_filter == 'deferred' %}selected{% endif %}>Deferred</option>
-                    </select>
-                    <select id="priority-filter" class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Priorities</option>
-                        <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
-                        <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
-                        <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
-                    </select>
-                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <select id="status-filter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <option value="">All Statuses</option>
+                    <option value="not_started" {% if status_filter == 'not_started' %}selected{% endif %}>Not Started</option>
+                    <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="deferred" {% if status_filter == 'deferred' %}selected{% endif %}>Deferred</option>
+                </select>
+                <select id="priority-filter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <option value="">All Priorities</option>
+                    <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                    <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                </select>
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center">
+                    <i class="fas fa-filter mr-2"></i> More Filters
+                </button>
             </div>
         </div>
     </div>
-    
+
     <!-- Overdue Tasks -->
     {% if overdue_tasks %}
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold text-red-600 mb-4">Overdue Tasks</h2>
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Related To</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {% for task in overdue_tasks %}
-                                <tr class="task-row" 
-                                    data-title="{{ task.title|lower }}" 
-                                    data-status="{{ task.status }}" 
-                                    data-priority="{{ task.priority }}">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            <a href="{% url 'task_detail' task.id %}">{{ task.title }}</a>
+        <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+            <div class="p-6 bg-gradient-to-r from-red-500 to-red-600 text-white">
+                <h2 class="text-xl font-bold flex items-center">
+                    <i class="fas fa-exclamation-circle mr-3"></i>
+                    Overdue Tasks
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Related To</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for task in overdue_tasks %}
+                            <tr class="task-row hover:bg-gray-50 transition-colors duration-200"
+                                data-title="{{ task.title|lower }}"
+                                data-status="{{ task.status }}"
+                                data-priority="{{ task.priority }}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center text-white font-semibold shadow-md mr-3">
+                                            <i class="fas fa-exclamation"></i>
                                         </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {% if task.status == 'not_started' %}bg-gray-100 text-gray-800
-                                            {% elif task.status == 'in_progress' %}bg-blue-100 text-blue-800
-                                            {% elif task.status == 'completed' %}bg-green-100 text-green-800
-                                            {% elif task.status == 'deferred' %}bg-yellow-100 text-yellow-800
-                                            {% endif %}">
-                                            {{ task.get_status_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {% if task.priority == 'high' %}bg-red-100 text-red-800
-                                            {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
-                                            {% elif task.priority == 'low' %}bg-green-100 text-green-800
-                                            {% endif %}">
-                                            {{ task.get_priority_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-medium">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <a href="{% url 'task_detail' task.id %}" class="hover:text-primary-600 transition-colors">
+                                                    {{ task.title }}
+                                                </a>
+                                            </div>
+                                            <div class="text-sm text-gray-500">Assigned to: {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                        {% if task.status == 'not_started' %}bg-gray-100 text-gray-800
+                                        {% elif task.status == 'in_progress' %}bg-blue-100 text-blue-800
+                                        {% elif task.status == 'completed' %}bg-green-100 text-green-800
+                                        {% elif task.status == 'deferred' %}bg-yellow-100 text-yellow-800
+                                        {% endif %}">
+                                        <div class="w-2 h-2 rounded-full mr-2
+                                            {% if task.status == 'not_started' %}bg-gray-500
+                                            {% elif task.status == 'in_progress' %}bg-blue-500
+                                            {% elif task.status == 'completed' %}bg-green-500
+                                            {% elif task.status == 'deferred' %}bg-yellow-500
+                                            {% endif %}"></div>
+                                        {{ task.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                        {% if task.priority == 'high' %}bg-red-100 text-red-800
+                                        {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                        {% elif task.priority == 'low' %}bg-green-100 text-green-800
+                                        {% endif %}">
+                                        {% if task.priority == 'high' %}
+                                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        {% elif task.priority == 'medium' %}
+                                            <i class="fas fa-minus mr-1"></i>
+                                        {% elif task.priority == 'low' %}
+                                            <i class="fas fa-arrow-down mr-1"></i>
+                                        {% endif %}
+                                        {{ task.get_priority_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-red-600">
                                         {{ task.due_date|date:"M d, Y H:i" }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {% if task.contact %}
-                                            <a href="{% url 'contact_detail' task.contact.id %}" class="text-blue-600 hover:underline">
+                                    </div>
+                                    <div class="text-xs text-red-500">
+                                        <i class="fas fa-exclamation-circle mr-1"></i> Overdue
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if task.contact %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-user text-gray-400 mr-2"></i>
+                                            <a href="{% url 'contact_detail' task.contact.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.contact.first_name }} {{ task.contact.last_name }}
                                             </a>
-                                        {% elif task.lead %}
-                                            <a href="{% url 'lead_detail' task.lead.id %}" class="text-blue-600 hover:underline">
+                                        </div>
+                                    {% elif task.lead %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-user-tag text-gray-400 mr-2"></i>
+                                            <a href="{% url 'lead_detail' task.lead.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.lead.title }}
                                             </a>
-                                        {% elif task.deal %}
-                                            <a href="{% url 'deal_detail' task.deal.id %}" class="text-blue-600 hover:underline">
+                                        </div>
+                                    {% elif task.deal %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-handshake text-gray-400 mr-2"></i>
+                                            <a href="{% url 'deal_detail' task.deal.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.deal.title }}
                                             </a>
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{% url 'task_detail' task.id %}" class="text-blue-600 hover:text-blue-900 mr-3" title="View">
+                                        </div>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500 italic">None</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{% url 'task_detail' task.id %}"
+                                           class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+                                           title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{% url 'task_update' task.id %}" class="text-yellow-600 hover:text-yellow-900 mr-3" title="Edit">
+                                        <a href="{% url 'task_update' task.id %}"
+                                           class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
+                                           title="Edit Task">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form method="post" action="{% url 'task_complete' task.id %}" class="inline">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.path }}">
-                                            <button type="submit" class="text-green-600 hover:text-green-900 mr-3" title="Mark as Completed">
+                                            <button type="submit"
+                                                    class="p-2 text-green-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors"
+                                                    title="Mark as Completed">
                                                 <i class="fas fa-check"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     {% endif %}
-    
+
     <!-- Upcoming Tasks -->
-    <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Upcoming Tasks</h2>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Related To</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% if upcoming_tasks %}
-                            {% for task in upcoming_tasks %}
-                                <tr class="task-row" 
-                                    data-title="{{ task.title|lower }}" 
-                                    data-status="{{ task.status }}" 
-                                    data-priority="{{ task.priority }}">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            <a href="{% url 'task_detail' task.id %}">{{ task.title }}</a>
+    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+        <div class="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <h2 class="text-xl font-bold flex items-center">
+                <i class="fas fa-calendar-day mr-3"></i>
+                Upcoming Tasks
+            </h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Related To</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% if upcoming_tasks %}
+                        {% for task in upcoming_tasks %}
+                            <tr class="task-row hover:bg-gray-50 transition-colors duration-200"
+                                data-title="{{ task.title|lower }}"
+                                data-status="{{ task.status }}"
+                                data-priority="{{ task.priority }}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center text-white font-semibold shadow-md mr-3">
+                                            {% if task.status == 'not_started' %}
+                                                <i class="fas fa-circle"></i>
+                                            {% elif task.status == 'in_progress' %}
+                                                <i class="fas fa-play"></i>
+                                            {% elif task.status == 'deferred' %}
+                                                <i class="fas fa-pause"></i>
+                                            {% endif %}
                                         </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {% if task.status == 'not_started' %}bg-gray-100 text-gray-800
-                                            {% elif task.status == 'in_progress' %}bg-blue-100 text-blue-800
-                                            {% elif task.status == 'completed' %}bg-green-100 text-green-800
-                                            {% elif task.status == 'deferred' %}bg-yellow-100 text-yellow-800
-                                            {% endif %}">
-                                            {{ task.get_status_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {% if task.priority == 'high' %}bg-red-100 text-red-800
-                                            {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
-                                            {% elif task.priority == 'low' %}bg-green-100 text-green-800
-                                            {% endif %}">
-                                            {{ task.get_priority_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <a href="{% url 'task_detail' task.id %}" class="hover:text-primary-600 transition-colors">
+                                                    {{ task.title }}
+                                                </a>
+                                            </div>
+                                            <div class="text-sm text-gray-500">Assigned to: {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                        {% if task.status == 'not_started' %}bg-gray-100 text-gray-800
+                                        {% elif task.status == 'in_progress' %}bg-blue-100 text-blue-800
+                                        {% elif task.status == 'completed' %}bg-green-100 text-green-800
+                                        {% elif task.status == 'deferred' %}bg-yellow-100 text-yellow-800
+                                        {% endif %}">
+                                        <div class="w-2 h-2 rounded-full mr-2
+                                            {% if task.status == 'not_started' %}bg-gray-500
+                                            {% elif task.status == 'in_progress' %}bg-blue-500
+                                            {% elif task.status == 'completed' %}bg-green-500
+                                            {% elif task.status == 'deferred' %}bg-yellow-500
+                                            {% endif %}"></div>
+                                        {{ task.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                        {% if task.priority == 'high' %}bg-red-100 text-red-800
+                                        {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                        {% elif task.priority == 'low' %}bg-green-100 text-green-800
+                                        {% endif %}">
+                                        {% if task.priority == 'high' %}
+                                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        {% elif task.priority == 'medium' %}
+                                            <i class="fas fa-minus mr-1"></i>
+                                        {% elif task.priority == 'low' %}
+                                            <i class="fas fa-arrow-down mr-1"></i>
+                                        {% endif %}
+                                        {{ task.get_priority_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">
                                         {{ task.due_date|date:"M d, Y H:i" }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {% if task.contact %}
-                                            <a href="{% url 'contact_detail' task.contact.id %}" class="text-blue-600 hover:underline">
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if task.contact %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-user text-gray-400 mr-2"></i>
+                                            <a href="{% url 'contact_detail' task.contact.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.contact.first_name }} {{ task.contact.last_name }}
                                             </a>
-                                        {% elif task.lead %}
-                                            <a href="{% url 'lead_detail' task.lead.id %}" class="text-blue-600 hover:underline">
+                                        </div>
+                                    {% elif task.lead %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-user-tag text-gray-400 mr-2"></i>
+                                            <a href="{% url 'lead_detail' task.lead.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.lead.title }}
                                             </a>
-                                        {% elif task.deal %}
-                                            <a href="{% url 'deal_detail' task.deal.id %}" class="text-blue-600 hover:underline">
+                                        </div>
+                                    {% elif task.deal %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-handshake text-gray-400 mr-2"></i>
+                                            <a href="{% url 'deal_detail' task.deal.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.deal.title }}
                                             </a>
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{% url 'task_detail' task.id %}" class="text-blue-600 hover:text-blue-900 mr-3" title="View">
+                                        </div>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500 italic">None</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{% url 'task_detail' task.id %}"
+                                           class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+                                           title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{% url 'task_update' task.id %}" class="text-yellow-600 hover:text-yellow-900 mr-3" title="Edit">
+                                        <a href="{% url 'task_update' task.id %}"
+                                           class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
+                                           title="Edit Task">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form method="post" action="{% url 'task_complete' task.id %}" class="inline">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.path }}">
-                                            <button type="submit" class="text-green-600 hover:text-green-900 mr-3" title="Mark as Completed">
+                                            <button type="submit"
+                                                    class="p-2 text-green-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors"
+                                                    title="Mark as Completed">
                                                 <i class="fas fa-check"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No upcoming tasks found.</td>
+                                    </div>
+                                </td>
                             </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-calendar-day text-gray-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-500 mb-4">No upcoming tasks found.</p>
+                                <a href="{% url 'task_create' %}" class="text-primary-600 hover:text-primary-700 font-medium">
+                                    Create a new task
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
     </div>
-    
+
     <!-- Completed Tasks -->
-    <div>
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Completed Tasks</h2>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Related To</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% if completed_tasks %}
-                            {% for task in completed_tasks %}
-                                <tr class="task-row" 
-                                    data-title="{{ task.title|lower }}" 
-                                    data-status="{{ task.status }}" 
-                                    data-priority="{{ task.priority }}">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            <a href="{% url 'task_detail' task.id %}">{{ task.title }}</a>
+    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+        <div class="p-6 bg-gradient-to-r from-green-500 to-green-600 text-white">
+            <h2 class="text-xl font-bold flex items-center">
+                <i class="fas fa-check-circle mr-3"></i>
+                Completed Tasks
+            </h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Related To</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% if completed_tasks %}
+                        {% for task in completed_tasks %}
+                            <tr class="task-row hover:bg-gray-50 transition-colors duration-200"
+                                data-title="{{ task.title|lower }}"
+                                data-status="{{ task.status }}"
+                                data-priority="{{ task.priority }}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center text-white font-semibold shadow-md mr-3">
+                                            <i class="fas fa-check"></i>
                                         </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            {{ task.get_status_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {% if task.priority == 'high' %}bg-red-100 text-red-800
-                                            {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
-                                            {% elif task.priority == 'low' %}bg-green-100 text-green-800
-                                            {% endif %}">
-                                            {{ task.get_priority_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <a href="{% url 'task_detail' task.id %}" class="hover:text-primary-600 transition-colors">
+                                                    {{ task.title }}
+                                                </a>
+                                            </div>
+                                            <div class="text-sm text-gray-500">Assigned to: {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <div class="w-2 h-2 rounded-full mr-2 bg-green-500"></div>
+                                        {{ task.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                        {% if task.priority == 'high' %}bg-red-100 text-red-800
+                                        {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                        {% elif task.priority == 'low' %}bg-green-100 text-green-800
+                                        {% endif %}">
+                                        {% if task.priority == 'high' %}
+                                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        {% elif task.priority == 'medium' %}
+                                            <i class="fas fa-minus mr-1"></i>
+                                        {% elif task.priority == 'low' %}
+                                            <i class="fas fa-arrow-down mr-1"></i>
+                                        {% endif %}
+                                        {{ task.get_priority_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">
                                         {{ task.due_date|date:"M d, Y H:i" }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {% if task.contact %}
-                                            <a href="{% url 'contact_detail' task.contact.id %}" class="text-blue-600 hover:underline">
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if task.contact %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-user text-gray-400 mr-2"></i>
+                                            <a href="{% url 'contact_detail' task.contact.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.contact.first_name }} {{ task.contact.last_name }}
                                             </a>
-                                        {% elif task.lead %}
-                                            <a href="{% url 'lead_detail' task.lead.id %}" class="text-blue-600 hover:underline">
+                                        </div>
+                                    {% elif task.lead %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-user-tag text-gray-400 mr-2"></i>
+                                            <a href="{% url 'lead_detail' task.lead.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.lead.title }}
                                             </a>
-                                        {% elif task.deal %}
-                                            <a href="{% url 'deal_detail' task.deal.id %}" class="text-blue-600 hover:underline">
+                                        </div>
+                                    {% elif task.deal %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-handshake text-gray-400 mr-2"></i>
+                                            <a href="{% url 'deal_detail' task.deal.id %}" class="text-sm text-primary-600 hover:text-primary-700">
                                                 {{ task.deal.title }}
                                             </a>
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{% url 'task_detail' task.id %}" class="text-blue-600 hover:text-blue-900 mr-3" title="View">
+                                        </div>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500 italic">None</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{% url 'task_detail' task.id %}"
+                                           class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+                                           title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{% url 'task_update' task.id %}" class="text-yellow-600 hover:text-yellow-900 mr-3" title="Edit">
+                                        <a href="{% url 'task_update' task.id %}"
+                                           class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
+                                           title="Edit Task">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{% url 'task_delete' task.id %}" class="text-red-600 hover:text-red-900" title="Delete">
+                                        <a href="{% url 'task_delete' task.id %}"
+                                           class="p-2 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors"
+                                           title="Delete Task">
                                             <i class="fas fa-trash"></i>
                                         </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No completed tasks found.</td>
+                                    </div>
+                                </td>
                             </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-check-circle text-gray-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-500">No completed tasks found.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -315,26 +546,27 @@
 
 {% block extra_js %}
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Search and filter functionality
     const searchInput = document.getElementById('search');
     const statusFilter = document.getElementById('status-filter');
     const priorityFilter = document.getElementById('priority-filter');
     const taskRows = document.querySelectorAll('.task-row');
-    
+
     function filterTasks() {
         const searchTerm = searchInput.value.toLowerCase();
         const statusValue = statusFilter.value;
         const priorityValue = priorityFilter.value;
-        
+
         taskRows.forEach(row => {
             const title = row.getAttribute('data-title');
             const status = row.getAttribute('data-status');
             const priority = row.getAttribute('data-priority');
-            
+
             const matchesSearch = title.includes(searchTerm);
             const matchesStatus = statusValue === '' || status === statusValue;
             const matchesPriority = priorityValue === '' || priority === priorityValue;
-            
+
             if (matchesSearch && matchesStatus && matchesPriority) {
                 row.style.display = '';
             } else {
@@ -342,23 +574,19 @@
             }
         });
     }
-    
+
     searchInput.addEventListener('input', filterTasks);
-    statusFilter.addEventListener('change', filterTasks);
-    priorityFilter.addEventListener('change', filterTasks);
-    
-    // Form submission for status filter
     statusFilter.addEventListener('change', function() {
         const url = new URL(window.location);
         url.searchParams.set('status', this.value);
         window.location = url;
     });
-    
-    // Form submission for priority filter
+
     priorityFilter.addEventListener('change', function() {
         const url = new URL(window.location);
         url.searchParams.set('priority', this.value);
         window.location = url;
     });
+});
 </script>
 {% endblock %}

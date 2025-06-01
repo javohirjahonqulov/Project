@@ -2,134 +2,262 @@
 
 {% block title %}Deals - CRM System{% endblock %}
 
+{% block breadcrumb %}Deals{% endblock %}
+
 {% block content %}
-<div class="container mx-auto">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h1 class="text-2xl font-semibold text-gray-800">Deals</h1>
-        <div class="flex flex-col sm:flex-row gap-2">
-            <a href="{% url 'deal_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md">
+<div class="container mx-auto space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Deals</h1>
+            <p class="text-gray-600 mt-1">Track and manage your sales opportunities</p>
+        </div>
+        <div class="flex space-x-3">
+            <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                <i class="fas fa-download mr-2"></i> Export
+            </button>
+            <a href="{% url 'deal_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                 <i class="fas fa-plus mr-2"></i> Add Deal
             </a>
         </div>
     </div>
-    
+
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow-md p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-500">
-                    <i class="fas fa-dollar-sign text-xl"></i>
+                <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-dollar-sign text-white text-xl"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Deal Value</p>
-                    <p class="text-2xl font-semibold text-gray-800">${{ total_value|floatformat:2 }}</p>
+                    <p class="text-sm font-medium text-gray-500">Total Deal Value</p>
+                    <p class="text-2xl font-bold text-gray-900">${{ total_value|floatformat:0 }}</p>
+                    <p class="text-xs text-green-600 flex items-center mt-1">
+                        <i class="fas fa-arrow-up mr-1"></i> +12% from last month
+                    </p>
                 </div>
             </div>
         </div>
-        
-        <div class="bg-white rounded-lg shadow-md p-6">
+
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-500">
-                    <i class="fas fa-chart-line text-xl"></i>
+                <div class="w-14 h-14 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-chart-line text-white text-xl"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Weighted Deal Value</p>
-                    <p class="text-2xl font-semibold text-gray-800">${{ weighted_value|floatformat:2 }}</p>
+                    <p class="text-sm font-medium text-gray-500">Weighted Value</p>
+                    <p class="text-2xl font-bold text-gray-900">${{ weighted_value|floatformat:0 }}</p>
+                    <p class="text-xs text-primary-600 flex items-center mt-1">
+                        <i class="fas fa-chart-line mr-1"></i> Forecast
+                    </p>
                 </div>
             </div>
         </div>
-        
-        <div class="bg-white rounded-lg shadow-md p-6">
+
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-500">
-                    <i class="fas fa-handshake text-xl"></i>
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-handshake text-white text-xl"></i>
                 </div>
                 <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Deals</p>
-                    <p class="text-2xl font-semibold text-gray-800">{{ deals|length }}</p>
+                    <p class="text-sm font-medium text-gray-500">Total Deals</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ deals|length }}</p>
+                    <p class="text-xs text-blue-600 flex items-center mt-1">
+                        <i class="fas fa-plus mr-1"></i> {{ new_deals_count|default:"0" }} new this week
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-percentage text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Win Rate</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ win_rate|default:"0" }}%</p>
+                    <p class="text-xs text-purple-600 flex items-center mt-1">
+                        <i class="fas fa-trophy mr-1"></i> This quarter
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="p-4 border-b">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="relative flex-grow">
-                    <input type="text" id="search" placeholder="Search deals..." class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <div class="flex-1">
+                <div class="relative">
+                    <input type="text" id="search" placeholder="Search deals by title, contact, or company..."
+                           class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <select id="stage-filter" class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Stages</option>
-                        <option value="discovery">Discovery</option>
-                        <option value="proposal">Proposal</option>
-                        <option value="negotiation">Negotiation</option>
-                        <option value="closed_won">Closed Won</option>
-                        <option value="closed_lost">Closed Lost</option>
-                    </select>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <select id="stage-filter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <option value="">All Stages</option>
+                    <option value="discovery">Discovery</option>
+                    <option value="proposal">Proposal</option>
+                    <option value="negotiation">Negotiation</option>
+                    <option value="closed_won">Closed Won</option>
+                    <option value="closed_lost">Closed Lost</option>
+                </select>
+                <select id="owner-filter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <option value="">All Owners</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                    {% endfor %}
+                </select>
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center">
+                    <i class="fas fa-filter mr-2"></i> More Filters
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deals Table -->
+    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">All Deals</h2>
+                <div class="flex items-center space-x-2">
+                    <button id="tableView" class="p-2 text-primary-500">
+                        <i class="fas fa-table"></i>
+                    </button>
+                    <button id="kanbanView" class="p-2 text-gray-400 hover:text-primary-500 transition-colors">
+                        <i class="fas fa-columns"></i>
+                    </button>
                 </div>
             </div>
         </div>
-        
+
         {% if deals %}
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stage</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Close Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Probability</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deal</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stage</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Close Date</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Probability</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" id="deals-table-body">
                         {% for deal in deals %}
-                            <tr class="deal-row" 
-                                data-title="{{ deal.title|lower }}" 
-                                data-stage="{{ deal.stage }}">
+                            <tr class="deal-row hover:bg-gray-50 transition-colors duration-200"
+                                data-title="{{ deal.title|lower }}"
+                                data-stage="{{ deal.stage }}"
+                                data-owner="{{ deal.assigned_to.id|default:'' }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">
-                                        <a href="{% url 'deal_detail' deal.id %}">{{ deal.title }}</a>
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center text-white font-semibold shadow-md mr-3">
+                                            {{ deal.title|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <a href="{% url 'deal_detail' deal.id %}" class="hover:text-primary-600 transition-colors">
+                                                    {{ deal.title }}
+                                                </a>
+                                            </div>
+                                            <div class="text-sm text-gray-500">Created {{ deal.created_at|date:"M d, Y" }}</div>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">
-                                        <a href="{% url 'contact_detail' deal.contact.id %}">
-                                            {{ deal.contact.first_name }} {{ deal.contact.last_name }}
-                                        </a>
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 mr-3">
+                                            {{ deal.contact.first_name|first|upper }}{{ deal.contact.last_name|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <a href="{% url 'contact_detail' deal.contact.id %}" class="hover:text-primary-600 transition-colors">
+                                                    {{ deal.contact.first_name }} {{ deal.contact.last_name }}
+                                                </a>
+                                            </div>
+                                            <div class="text-sm text-gray-500">{{ deal.contact.company|default:"No company" }}</div>
+                                        </div>
                                     </div>
-                                    <div class="text-sm text-gray-500">{{ deal.contact.company|default:"-" }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
                                         {% if deal.stage == 'discovery' %}bg-blue-100 text-blue-800
                                         {% elif deal.stage == 'proposal' %}bg-yellow-100 text-yellow-800
-                                        {% elif deal.stage == 'negotiation' %}bg-purple-100 text-purple-800
+                                        {% elif deal.stage == 'negotiation' %}bg-primary-100 text-primary-800
                                         {% elif deal.stage == 'closed_won' %}bg-green-100 text-green-800
                                         {% elif deal.stage == 'closed_lost' %}bg-red-100 text-red-800
                                         {% endif %}">
+                                        <div class="w-2 h-2 rounded-full mr-2
+                                            {% if deal.stage == 'discovery' %}bg-blue-500
+                                            {% elif deal.stage == 'proposal' %}bg-yellow-500
+                                            {% elif deal.stage == 'negotiation' %}bg-primary-500
+                                            {% elif deal.stage == 'closed_won' %}bg-green-500
+                                            {% elif deal.stage == 'closed_lost' %}bg-red-500
+                                            {% endif %}"></div>
                                         {{ deal.get_stage_display }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ deal.amount }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deal.expected_close_date|date:"M d, Y" }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deal.probability }}%</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">${{ deal.amount|floatformat:0 }}</div>
+                                    <div class="text-sm text-gray-500">Weighted: ${% widthratio deal.amount 100 deal.probability %}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ deal.expected_close_date|date:"M d, Y" }}</div>
+                                    {% if deal.expected_close_date < today %}
+                                        <div class="text-xs text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i> Overdue
+                                        </div>
+                                    {% elif deal.expected_close_date|timeuntil < "7 days" %}
+                                        <div class="text-xs text-yellow-600 flex items-center">
+                                            <i class="fas fa-clock mr-1"></i> Due soon
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                            <div class="bg-primary-500 h-2 rounded-full" style="width: {{ deal.probability }}%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">{{ deal.probability }}%</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if deal.assigned_to %}
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 mr-2">
+                                                {{ deal.assigned_to.username|first|upper }}
+                                            </div>
+                                            <span class="text-sm text-gray-900">{{ deal.assigned_to.get_full_name|default:deal.assigned_to.username }}</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500 italic">Unassigned</span>
+                                    {% endif %}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{% url 'deal_detail' deal.id %}" class="text-blue-600 hover:text-blue-900 mr-3" title="View">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{% url 'deal_update' deal.id %}" class="text-yellow-600 hover:text-yellow-900 mr-3" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{% url 'deal_delete' deal.id %}" class="text-red-600 hover:text-red-900" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{% url 'deal_detail' deal.id %}"
+                                           class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+                                           title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'deal_update' deal.id %}"
+                                           class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
+                                           title="Edit Deal">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'deal_delete' deal.id %}"
+                                           class="p-2 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors"
+                                           title="Delete Deal">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -137,8 +265,15 @@
                 </table>
             </div>
         {% else %}
-            <div class="p-6 text-center">
-                <p class="text-gray-500">No deals found. <a href="{% url 'deal_create' %}" class="text-blue-600 hover:underline">Add your first deal</a>.</p>
+            <div class="p-12 text-center">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-handshake text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No deals found</h3>
+                <p class="text-gray-500 mb-6">Start tracking your sales opportunities by creating your first deal.</p>
+                <a href="{% url 'deal_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-plus mr-2"></i> Create Your First Deal
+                </a>
             </div>
         {% endif %}
     </div>
@@ -147,31 +282,37 @@
 
 {% block extra_js %}
 <script>
-    // Search and filter functionality
+document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search');
     const stageFilter = document.getElementById('stage-filter');
+    const ownerFilter = document.getElementById('owner-filter');
     const dealRows = document.querySelectorAll('.deal-row');
-    
+
     function filterDeals() {
         const searchTerm = searchInput.value.toLowerCase();
         const stageValue = stageFilter.value;
-        
+        const ownerValue = ownerFilter.value;
+
         dealRows.forEach(row => {
             const title = row.getAttribute('data-title');
             const stage = row.getAttribute('data-stage');
-            
+            const owner = row.getAttribute('data-owner');
+
             const matchesSearch = title.includes(searchTerm);
             const matchesStage = stageValue === '' || stage === stageValue;
-            
-            if (matchesSearch && matchesStage) {
+            const matchesOwner = ownerValue === '' || owner === ownerValue;
+
+            if (matchesSearch && matchesStage && matchesOwner) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
             }
         });
     }
-    
+
     searchInput.addEventListener('input', filterDeals);
     stageFilter.addEventListener('change', filterDeals);
+    ownerFilter.addEventListener('change', filterDeals);
+});
 </script>
 {% endblock %}

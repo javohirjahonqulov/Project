@@ -5,113 +5,246 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
             <div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900">User Profile</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">Personal details and profile information</p>
+                <h1 class="text-3xl font-bold text-gray-900">Profile Settings</h1>
+                <p class="mt-2 text-gray-600">Manage your account information and preferences</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+                    <p class="text-sm text-gray-500">{{ user.email }}</p>
+                </div>
+                {% if user.profile.profile_image and user.profile.profile_image.url %}
+                    <img class="h-12 w-12 rounded-full object-cover shadow-md border-2 border-primary-200"
+                         src="{{ user.profile.profile_image.url }}"
+                         alt="{{ user.username }}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                {% endif %}
+                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white flex items-center justify-center font-semibold shadow-md"
+                     style="display: {% if user.profile.profile_image and user.profile.profile_image.url %}none{% else %}flex{% endif %};">
+                    {{ user.username|first|upper }}
+                </div>
             </div>
         </div>
+    </div>
 
-        <form method="POST" enctype="multipart/form-data" class="px-4 py-5 sm:p-6">
+    <!-- Profile Form -->
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-6">
-                    <h4 class="text-md font-medium text-gray-900">Account Information</h4>
 
-                    <div>
-                        <label for="{{ user_form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
-                        {{ user_form.username }}
-                        {% if user_form.username.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ user_form.username.errors.0 }}</p>
+            <!-- Profile Image Section -->
+            <div class="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-8">
+                <div class="flex items-center space-x-6">
+                    <div class="relative">
+                        {% if user.profile.profile_image and user.profile.profile_image.url %}
+                            <img class="h-24 w-24 rounded-full object-cover shadow-lg border-4 border-white"
+                                 src="{{ user.profile.profile_image.url }}"
+                                 alt="{{ user.username }}"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                 id="profile-preview">
                         {% endif %}
-                    </div>
-
-                    <div>
-                        <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
-                        {{ user_form.email }}
-                        {% if user_form.email.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ user_form.email.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <label for="{{ user_form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First Name</label>
-                        {{ user_form.first_name }}
-                        {% if user_form.first_name.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ user_form.first_name.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <label for="{{ user_form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last Name</label>
-                        {{ user_form.last_name }}
-                        {% if user_form.last_name.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ user_form.last_name.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <h4 class="text-md font-medium text-gray-900">Profile Information</h4>
-
-                    <div>
-                        <label for="{{ profile_form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700">Bio</label>
-                        {{ profile_form.bio }}
-                        {% if profile_form.bio.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ profile_form.bio.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <label for="{{ profile_form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                        {{ profile_form.phone_number }}
-                        {% if profile_form.phone_number.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ profile_form.phone_number.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <label for="{{ profile_form.position.id_for_label }}" class="block text-sm font-medium text-gray-700">Position</label>
-                        {{ profile_form.position }}
-                        {% if profile_form.position.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ profile_form.position.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Profile image section -->
-                    <div>
-                        <label for="{{ profile_form.profile_image.id_for_label }}" class="block text-sm font-medium text-gray-700">Profile Image</label>
-                        <div class="flex items-center space-x-4">
-                            {% if user.profile.profile_image and user.profile.profile_image.url %}
-                                <img src="{{ user.profile.profile_image.url }}"
-                                     alt="Profile Image"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                     class="h-20 w-20 rounded-full object-cover shadow">
-                            {% endif %}
-
-                            <!-- Harfli avatar fallback (yumaloq shaklda) -->
-                            <div class="w-20 aspect-square rounded-full bg-blue-600 text-white font-semibold text-2xl flex items-center justify-center shadow"
-                                 style="display: {% if user.profile.profile_image and user.profile.profile_image.url %}none{% else %}flex{% endif %};">
-                                {{ user.username|first|upper }}
-                            </div>
-
-                            <!-- File input -->
-                            {{ profile_form.profile_image }}
+                        <div class="h-24 w-24 rounded-full bg-white bg-opacity-20 text-white flex items-center justify-center font-bold text-2xl shadow-lg border-4 border-white"
+                             style="display: {% if user.profile.profile_image and user.profile.profile_image.url %}none{% else %}flex{% endif %};"
+                             id="profile-fallback">
+                            {{ user.username|first|upper }}
                         </div>
-                        {% if profile_form.profile_image.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ profile_form.profile_image.errors.0 }}</p>
-                        {% endif %}
+                        <label for="{{ profile_form.profile_image.id_for_label }}" class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-camera text-primary-600"></i>
+                        </label>
+                    </div>
+                    <div class="text-white">
+                        <h3 class="text-xl font-semibold">{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="text-primary-100">{{ user.profile.position|default:"CRM User" }}</p>
+                        <p class="text-sm text-primary-200 mt-1">Member since {{ user.date_joined|date:"F Y" }}</p>
                     </div>
                 </div>
+                {{ profile_form.profile_image }}
             </div>
 
-            <div class="mt-6">
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Save Changes
-                </button>
+            <!-- Form Content -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Account Information -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h4 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-user-circle mr-2 text-primary-500"></i>
+                                Account Information
+                            </h4>
+                            <p class="text-sm text-gray-600 mt-1">Update your basic account details</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label for="{{ user_form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-at mr-1 text-primary-400"></i>Username
+                                </label>
+                                {{ user_form.username }}
+                                {% if user_form.username.errors %}
+                                    <p class="text-red-500 text-xs mt-2 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>
+                                        {{ user_form.username.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-envelope mr-1 text-primary-400"></i>Email Address
+                                </label>
+                                {{ user_form.email }}
+                                {% if user_form.email.errors %}
+                                    <p class="text-red-500 text-xs mt-2 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>
+                                        {{ user_form.email.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="{{ user_form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-user mr-1 text-primary-400"></i>First Name
+                                    </label>
+                                    {{ user_form.first_name }}
+                                    {% if user_form.first_name.errors %}
+                                        <p class="text-red-500 text-xs mt-2">{{ user_form.first_name.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    <label for="{{ user_form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-user mr-1 text-primary-400"></i>Last Name
+                                    </label>
+                                    {{ user_form.last_name }}
+                                    {% if user_form.last_name.errors %}
+                                        <p class="text-red-500 text-xs mt-2">{{ user_form.last_name.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Information -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h4 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-id-card mr-2 text-primary-500"></i>
+                                Profile Information
+                            </h4>
+                            <p class="text-sm text-gray-600 mt-1">Tell us more about yourself</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label for="{{ profile_form.position.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-briefcase mr-1 text-primary-400"></i>Position/Title
+                                </label>
+                                {{ profile_form.position }}
+                                {% if profile_form.position.errors %}
+                                    <p class="text-red-500 text-xs mt-2">{{ profile_form.position.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label for="{{ profile_form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-phone mr-1 text-primary-400"></i>Phone Number
+                                </label>
+                                {{ profile_form.phone_number }}
+                                {% if profile_form.phone_number.errors %}
+                                    <p class="text-red-500 text-xs mt-2">{{ profile_form.phone_number.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label for="{{ profile_form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-align-left mr-1 text-primary-400"></i>Bio
+                                </label>
+                                {{ profile_form.bio }}
+                                {% if profile_form.bio.errors %}
+                                    <p class="text-red-500 text-xs mt-2">{{ profile_form.bio.errors.0 }}</p>
+                                {% endif %}
+                                <p class="text-xs text-gray-500 mt-1">Tell us a bit about yourself and your role</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex space-x-3">
+                            <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                <i class="fas fa-save mr-2"></i>
+                                Save Changes
+                            </button>
+
+                            <a href="{% url 'dashboard' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                                <i class="fas fa-times mr-2"></i>
+                                Cancel
+                            </a>
+                        </div>
+
+                        <a href="#" class="text-sm text-red-600 hover:text-red-500 transition-colors" onclick="confirmDeleteAccount()">
+                            <i class="fas fa-trash mr-1"></i>
+                            Delete Account
+                        </a>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+// Profile image preview
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
+    inputs.forEach(input => {
+        input.className = 'appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-all duration-200';
+    });
+
+    // File input styling
+    const fileInput = document.getElementById('{{ profile_form.profile_image.id_for_label }}');
+    if (fileInput) {
+        fileInput.className = 'hidden';
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('profile-preview');
+                    const fallback = document.getElementById('profile-fallback');
+
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        fallback.style.display = 'none';
+                    } else {
+                        // Create new preview image
+                        const newPreview = document.createElement('img');
+                        newPreview.id = 'profile-preview';
+                        newPreview.className = 'h-24 w-24 rounded-full object-cover shadow-lg border-4 border-white';
+                        newPreview.src = e.target.result;
+                        fallback.parentNode.insertBefore(newPreview, fallback);
+                        fallback.style.display = 'none';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+function confirmDeleteAccount() {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        // Handle account deletion
+        alert('Account deletion functionality would be implemented here');
+    }
+}
+</script>
 {% endblock %}

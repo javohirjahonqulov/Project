@@ -3,80 +3,167 @@
 {% block title %}Register - CRM System{% endblock %}
 
 {% block auth_content %}
-<div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg space-y-6">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-lg w-full space-y-8">
+        <!-- Logo and Header -->
         <div class="text-center">
-            <h2 class="text-3xl font-bold text-gray-900">Create an account</h2>
+            <div class="mx-auto w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <i class="fas fa-user-plus text-white text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900">Create your account</h2>
             <p class="mt-2 text-sm text-gray-600">
-                Already have one?
-                <a href="{% url 'login' %}" class="text-blue-600 hover:underline font-medium">Sign in</a>
+                Join thousands of professionals using our CRM
             </p>
         </div>
 
-        <form method="POST" class="space-y-5">
-            {% csrf_token %}
+        <!-- Registration Form -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user mr-2 text-primary-400"></i>First Name
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <p class="text-red-500 text-xs mt-2 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ form.first_name.errors.0 }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user mr-2 text-primary-400"></i>Last Name
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <p class="text-red-500 text-xs mt-2 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ form.last_name.errors.0 }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <div>
-                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First Name</label>
-                    {{ form.first_name }}
-                    {% if form.first_name.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.first_name.errors.0 }}</p>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-envelope mr-2 text-primary-400"></i>Email Address
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="text-red-500 text-xs mt-2 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.email.errors.0 }}
+                        </p>
                     {% endif %}
                 </div>
+
                 <div>
-                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last Name</label>
-                    {{ form.last_name }}
-                    {% if form.last_name.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.last_name.errors.0 }}</p>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-at mr-2 text-primary-400"></i>Username
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <p class="text-red-500 text-xs mt-2 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.username.errors.0 }}
+                        </p>
                     {% endif %}
                 </div>
-            </div>
 
-            <div>
-                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-primary-400"></i>Password
+                    </label>
+                    <div class="relative">
+                        {{ form.password1 }}
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('{{ form.password1.id_for_label }}', 'password1-toggle')">
+                            <i class="fas fa-eye text-gray-400 hover:text-primary-500 transition-colors" id="password1-toggle"></i>
+                        </button>
+                    </div>
+                    {% if form.password1.errors %}
+                        <p class="text-red-500 text-xs mt-2 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.password1.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
 
-            <div>
-                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.username.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-primary-400"></i>Confirm Password
+                    </label>
+                    <div class="relative">
+                        {{ form.password2 }}
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('{{ form.password2.id_for_label }}', 'password2-toggle')">
+                            <i class="fas fa-eye text-gray-400 hover:text-primary-500 transition-colors" id="password2-toggle"></i>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}
+                        <p class="text-red-500 text-xs mt-2 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ form.password2.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
 
-            <div>
-                <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
-                {{ form.password1 }}
-                {% if form.password1.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.password1.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <div class="flex items-center">
+                    <input id="terms" name="terms" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" required>
+                    <label for="terms" class="ml-2 block text-sm text-gray-700">
+                        I agree to the
+                        <a href="#" class="text-primary-600 hover:text-primary-500">Terms of Service</a>
+                        and
+                        <a href="#" class="text-primary-600 hover:text-primary-500">Privacy Policy</a>
+                    </label>
+                </div>
 
-            <div>
-                <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                {{ form.password2 }}
-                {% if form.password2.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.password2.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Create Account
+                </button>
 
-            <button type="submit" class="w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-sm shadow-md">
-                Create Account
-            </button>
-        </form>
+                <div class="text-center">
+                    <p class="text-sm text-gray-600">
+                        Already have an account?
+                        <a href="{% url 'login' %}" class="font-medium text-primary-600 hover:text-primary-500 transition-colors">
+                            Sign in here
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-    // Remove password help texts if not already done in forms.py
-    document.addEventListener('DOMContentLoaded', () => {
-        const helpTexts = document.querySelectorAll('p.help');
-        helpTexts.forEach(p => p.remove());
+function togglePassword(fieldId, toggleId) {
+    const passwordField = document.getElementById(fieldId);
+    const toggleIcon = document.getElementById(toggleId);
+
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+// Add input styling
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+    inputs.forEach(input => {
+        input.className = 'appearance-none relative block w-full px-3 py-3 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm transition-all duration-200';
     });
+
+    // Remove password help texts
+    const helpTexts = document.querySelectorAll('p.help');
+    helpTexts.forEach(p => p.remove());
+});
 </script>
 {% endblock %}

@@ -7,13 +7,97 @@
     <title>{% block title %}CRM System{% endblock %}</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fef6e9',
+                            100: '#fdead3',
+                            200: '#fbd5a7',
+                            300: '#f8c07b',
+                            400: '#f5ab4f',
+                            500: '#ea982f', /* Main primary color */
+                            600: '#d17a1e',
+                            700: '#ad5f18',
+                            800: '#894812',
+                            900: '#65320c',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <style>
-        /* Add custom styles here */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ea982f;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d17a1e;
+        }
+
+        /* Alert messages */
         .messages .alert {
-            transition: opacity 0.3s ease-in-out;
+            transition: all 0.3s ease-in-out;
+            transform-origin: top;
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sidebar animation */
+        .sidebar-item {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item:hover {
+            transform: translateX(5px);
         }
 
         /* Mobile responsive styles */
@@ -27,34 +111,106 @@
                 left: 0;
                 transform: translateX(-100%);
                 transition: transform 0.3s ease-in-out;
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
             }
 
             aside.show {
                 transform: translateX(0);
             }
+
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+
+            .overlay.show {
+                opacity: 1;
+                pointer-events: auto;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 min-h-screen flex flex-col">
     {% if user.is_authenticated %}
-        {% include 'includes/navbar.html' %}
+        <div id="overlay" class="overlay"></div>
+        <header class="bg-white shadow-soft sticky top-0 z-30">
+            <div class="container mx-auto">
+                {% include 'includes/navbar.html' %}
+            </div>
+        </header>
         <div class="flex flex-1">
-            {% include 'includes/sidebar.html' %}
-            <main class="flex-1 p-6 overflow-y-auto">
-                {% include 'includes/messages.html' %}
-                {% block content %}{% endblock %}
+            <aside id="sidebar" class="bg-white shadow-soft w-64 transition-all duration-300 ease-in-out hidden md:block">
+                {% include 'includes/sidebar.html' %}
+            </aside>
+            <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+                <div class="container mx-auto">
+                    <div class="mb-6">
+                        {% include 'includes/messages.html' %}
+                    </div>
+                    <div class="bg-white rounded-lg shadow-card p-6">
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
             </main>
         </div>
+        <footer class="bg-white py-4 text-center text-gray-500 text-sm shadow-soft mt-auto">
+            <div class="container mx-auto">
+                <p>&copy; {% now "Y" %} CRM System. All rights reserved.</p>
+            </div>
+        </footer>
     {% else %}
-        <main class="flex-1">
-            {% include 'includes/messages.html' %}
-            {% block auth_content %}{% endblock %}
+        <main class="flex-1 bg-gradient-to-br from-primary-50 to-white min-h-screen">
+            <div class="container mx-auto py-8 px-4">
+                {% include 'includes/messages.html' %}
+                {% block auth_content %}{% endblock %}
+            </div>
         </main>
     {% endif %}
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Mobile sidebar toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            if (toggleButton && sidebar && overlay) {
+                toggleButton.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                    overlay.classList.toggle('show');
+                    document.body.classList.toggle('overflow-hidden');
+                });
+
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                    document.body.classList.remove('overflow-hidden');
+                });
+            }
+
+            // Auto-hide messages after 5 seconds
+            const messages = document.querySelectorAll('.messages .alert');
+            messages.forEach(message => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

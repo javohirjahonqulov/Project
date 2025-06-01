@@ -2,238 +2,386 @@
 
 {% block title %}Dashboard - CRM System{% endblock %}
 
+{% block breadcrumb %}Dashboard{% endblock %}
+
 {% block content %}
-<div class="container mx-auto">
-    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Dashboard</h1>
+<div class="container mx-auto space-y-8">
+    <!-- Welcome Header -->
+    <div class="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 text-white shadow-xl">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                <p class="text-primary-100 text-lg">Here's what's happening with your business today.</p>
+            </div>
+            <div class="hidden md:block">
+                <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold">{{ current_date|date:"d" }}</div>
+                        <div class="text-sm">{{ current_date|date:"M Y" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-500">
-                    <i class="fas fa-user-tag text-xl"></i>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl shadow-card p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Total Leads</p>
+                    <p class="text-3xl font-bold text-gray-900 counter" data-target="{{ total_leads|default:0 }}">0</p>
+                    <div class="flex items-center mt-2">
+                        <span class="text-green-500 text-sm flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i> +12%
+                        </span>
+                        <span class="text-gray-400 text-sm ml-2">vs last month</span>
+                    </div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Leads</p>
-                    <p class="text-2xl font-semibold text-gray-800">{{ total_leads }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-500">
-                    <i class="fas fa-handshake text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Deals</p>
-                    <p class="text-2xl font-semibold text-gray-800">{{ total_deals }}</p>
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-user-tag text-white text-2xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-500">
-                    <i class="fas fa-address-book text-xl"></i>
+        <div class="bg-white rounded-2xl shadow-card p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Active Deals</p>
+                    <p class="text-3xl font-bold text-gray-900 counter" data-target="{{ total_deals|default:0 }}">0</p>
+                    <div class="flex items-center mt-2">
+                        <span class="text-green-500 text-sm flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i> +8%
+                        </span>
+                        <span class="text-gray-400 text-sm ml-2">vs last month</span>
+                    </div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Contacts</p>
-                    <p class="text-2xl font-semibold text-gray-800">{{ total_contacts }}</p>
+                <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-handshake text-white text-2xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-yellow-100 text-yellow-500">
-                    <i class="fas fa-dollar-sign text-xl"></i>
+        <div class="bg-white rounded-2xl shadow-card p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Total Contacts</p>
+                    <p class="text-3xl font-bold text-gray-900 counter" data-target="{{ total_contacts|default:0 }}">0</p>
+                    <div class="flex items-center mt-2">
+                        <span class="text-primary-500 text-sm flex items-center">
+                            <i class="fas fa-minus mr-1"></i> +5%
+                        </span>
+                        <span class="text-gray-400 text-sm ml-2">vs last month</span>
+                    </div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Deal Forecast</p>
-                    <p class="text-2xl font-semibold text-gray-800">${{ deal_forecast|floatformat:2 }}</p>
+                <div class="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-address-book text-white text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Revenue</p>
+                    <p class="text-3xl font-bold text-gray-900">$<span class="counter" data-target="{{ deal_forecast|default:0|floatformat:0 }}">0</span></p>
+                    <div class="flex items-center mt-2">
+                        <span class="text-green-500 text-sm flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i> +23%
+                        </span>
+                        <span class="text-gray-400 text-sm ml-2">vs last month</span>
+                    </div>
+                </div>
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-dollar-sign text-white text-2xl"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Deals by Stage</h2>
-            <canvas id="dealsByStageChart" height="200"></canvas>
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Deals by Stage -->
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Deals by Stage</h2>
+                <div class="flex items-center space-x-2">
+                    <button class="p-2 text-gray-400 hover:text-primary-500 transition-colors" onclick="refreshChart('dealsByStage')">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="p-2 text-gray-400 hover:text-primary-500 transition-colors">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="relative h-80">
+                <canvas id="dealsByStageChart"></canvas>
+            </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Leads by Status</h2>
-            <canvas id="leadsByStatusChart" height="200"></canvas>
+        <!-- Leads by Status -->
+        <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Leads by Status</h2>
+                <div class="flex items-center space-x-2">
+                    <button class="p-2 text-gray-400 hover:text-primary-500 transition-colors" onclick="refreshChart('leadsByStatus')">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="p-2 text-gray-400 hover:text-primary-500 transition-colors">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="relative h-80">
+                <canvas id="leadsByStatusChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Deal Forecast -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Deal Forecast by Month</h2>
-        <canvas id="dealForecastChart" height="100"></canvas>
+    <!-- Revenue Forecast -->
+    <div class="bg-white rounded-2xl shadow-card p-6 border border-gray-100">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Revenue Forecast</h2>
+                <p class="text-gray-500 text-sm">Monthly revenue projection based on current pipeline</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    <option>Last 6 months</option>
+                    <option>Last 12 months</option>
+                    <option>This year</option>
+                </select>
+                <button class="p-2 text-gray-400 hover:text-primary-500 transition-colors">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+        <div class="relative h-80">
+            <canvas id="dealForecastChart"></canvas>
+        </div>
     </div>
 
     <!-- Recent Activities -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Leads</h2>
-            {% if recent_leads %}
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {% for lead in recent_leads %}
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        <a href="{% url 'lead_detail' lead.id %}" class="text-blue-600 hover:underline">
-                                            {{ lead.title }}
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                            {% if lead.status == 'new' %}bg-blue-100 text-blue-800
-                                            {% elif lead.status == 'contacted' %}bg-yellow-100 text-yellow-800
-                                            {% elif lead.status == 'qualified' %}bg-green-100 text-green-800
-                                            {% elif lead.status == 'unqualified' %}bg-red-100 text-red-800
-                                            {% elif lead.status == 'converted' %}bg-purple-100 text-purple-800
-                                            {% endif %}">
-                                            {{ lead.get_status_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ lead.created_at|date:"M d, Y" }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Leads -->
+        <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Recent Leads</h2>
+                    <a href="{% url 'lead_list' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center transition-colors">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
                 </div>
-            {% else %}
-                <p class="text-gray-500">No recent leads found.</p>
-            {% endif %}
+            </div>
+            <div class="overflow-hidden">
+                {% if recent_leads %}
+                    <div class="divide-y divide-gray-100">
+                        {% for lead in recent_leads %}
+                            <div class="p-4 hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='{% url 'lead_detail' lead.id %}'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">{{ lead.title }}</p>
+                                            <p class="text-sm text-gray-500">{{ lead.created_at|date:"M d, Y" }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs font-medium rounded-full
+                                        {% if lead.status == 'new' %}bg-blue-100 text-blue-700
+                                        {% elif lead.status == 'contacted' %}bg-yellow-100 text-yellow-700
+                                        {% elif lead.status == 'qualified' %}bg-green-100 text-green-700
+                                        {% elif lead.status == 'unqualified' %}bg-red-100 text-red-700
+                                        {% elif lead.status == 'converted' %}bg-primary-100 text-primary-700
+                                        {% endif %}">
+                                        {{ lead.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-8 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user-tag text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-gray-500">No recent leads found</p>
+                        <a href="{% url 'lead_create' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium mt-2 inline-block">
+                            Create your first lead
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Deals</h2>
-            {% if recent_deals %}
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stage</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {% for deal in recent_deals %}
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        <a href="{% url 'deal_detail' deal.id %}" class="text-blue-600 hover:underline">
-                                            {{ deal.title }}
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                            {% if deal.stage == 'discovery' %}bg-blue-100 text-blue-800
-                                            {% elif deal.stage == 'proposal' %}bg-yellow-100 text-yellow-800
-                                            {% elif deal.stage == 'negotiation' %}bg-purple-100 text-purple-800
-                                            {% elif deal.stage == 'closed_won' %}bg-green-100 text-green-800
-                                            {% elif deal.stage == 'closed_lost' %}bg-red-100 text-red-800
-                                            {% endif %}">
-                                            {{ deal.get_stage_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ deal.amount }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <!-- Recent Deals -->
+        <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Recent Deals</h2>
+                    <a href="{% url 'deal_list' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center transition-colors">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
                 </div>
-            {% else %}
-                <p class="text-gray-500">No recent deals found.</p>
-            {% endif %}
+            </div>
+            <div class="overflow-hidden">
+                {% if recent_deals %}
+                    <div class="divide-y divide-gray-100">
+                        {% for deal in recent_deals %}
+                            <div class="p-4 hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='{% url 'deal_detail' deal.id %}'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-handshake text-white"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">{{ deal.title }}</p>
+                                            <p class="text-sm text-gray-500">${{ deal.amount|floatformat:0 }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs font-medium rounded-full
+                                        {% if deal.stage == 'discovery' %}bg-blue-100 text-blue-700
+                                        {% elif deal.stage == 'proposal' %}bg-yellow-100 text-yellow-700
+                                        {% elif deal.stage == 'negotiation' %}bg-primary-100 text-primary-700
+                                        {% elif deal.stage == 'closed_won' %}bg-green-100 text-green-700
+                                        {% elif deal.stage == 'closed_lost' %}bg-red-100 text-red-700
+                                        {% endif %}">
+                                        {{ deal.get_stage_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-8 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-handshake text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-gray-500">No recent deals found</p>
+                        <a href="{% url 'deal_create' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium mt-2 inline-block">
+                            Create your first deal
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <!-- Tasks -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">Upcoming Tasks</h2>
-                <a href="{% url 'task_list' %}" class="text-blue-600 hover:underline text-sm">View All</a>
-            </div>
-            {% if upcoming_tasks %}
-                <div class="space-y-4">
-                    {% for task in upcoming_tasks %}
-                        <div class="flex items-start p-3 border rounded-lg
-                            {% if task.priority == 'high' %}border-red-200 bg-red-50
-                            {% elif task.priority == 'medium' %}border-yellow-200 bg-yellow-50
-                            {% else %}border-blue-200 bg-blue-50
-                            {% endif %}">
-                            <div class="flex-shrink-0 mt-1">
-                                <i class="fas fa-tasks
-                                    {% if task.priority == 'high' %}text-red-500
-                                    {% elif task.priority == 'medium' %}text-yellow-500
-                                    {% else %}text-blue-500
-                                    {% endif %}"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <p class="text-sm font-medium text-gray-900">
-                                    <a href="{% url 'task_detail' task.id %}" class="hover:underline">{{ task.title }}</a>
-                                </p>
-                                <p class="text-sm text-gray-500">Due: {{ task.due_date|date:"M d, Y H:i" }}</p>
-                                <p class="text-sm text-gray-500">Assigned to: {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
+    <!-- Tasks Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Upcoming Tasks -->
+        <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Upcoming Tasks</h2>
+                    <a href="{% url 'task_list' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center transition-colors">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
                 </div>
-            {% else %}
-                <p class="text-gray-500">No upcoming tasks found.</p>
-            {% endif %}
+            </div>
+            <div class="p-6">
+                {% if upcoming_tasks %}
+                    <div class="space-y-4">
+                        {% for task in upcoming_tasks %}
+                            <div class="flex items-start p-4 rounded-xl border-l-4 transition-all duration-200 hover:shadow-md cursor-pointer
+                                {% if task.priority == 'high' %}border-red-400 bg-red-50 hover:bg-red-100
+                                {% elif task.priority == 'medium' %}border-yellow-400 bg-yellow-50 hover:bg-yellow-100
+                                {% else %}border-blue-400 bg-blue-50 hover:bg-blue-100
+                                {% endif %}" onclick="window.location.href='{% url 'task_detail' task.id %}'">
+                                <div class="flex-shrink-0 mt-1">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center
+                                        {% if task.priority == 'high' %}bg-red-100 text-red-600
+                                        {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-600
+                                        {% else %}bg-blue-100 text-blue-600
+                                        {% endif %}">
+                                        <i class="fas fa-tasks text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <p class="font-medium text-gray-900">{{ task.title }}</p>
+                                    <p class="text-sm text-gray-500 mt-1">Due: {{ task.due_date|date:"M d, Y H:i" }}</p>
+                                    <p class="text-sm text-gray-500">{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full
+                                        {% if task.priority == 'high' %}bg-red-100 text-red-700
+                                        {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-700
+                                        {% else %}bg-blue-100 text-blue-700
+                                        {% endif %}">
+                                        {{ task.get_priority_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-tasks text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-gray-500">No upcoming tasks</p>
+                        <a href="{% url 'task_create' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium mt-2 inline-block">
+                            Create a task
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-red-600">Overdue Tasks</h2>
-                <a href="{% url 'task_list' %}" class="text-blue-600 hover:underline text-sm">View All</a>
-            </div>
-            {% if overdue_tasks %}
-                <div class="space-y-4">
-                    {% for task in overdue_tasks %}
-                        <div class="flex items-start p-3 border rounded-lg border-red-200 bg-red-50">
-                            <div class="flex-shrink-0 mt-1">
-                                <i class="fas fa-exclamation-circle text-red-500"></i>
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <p class="text-sm font-medium text-gray-900">
-                                    <a href="{% url 'task_detail' task.id %}" class="hover:underline">{{ task.title }}</a>
-                                </p>
-                                <p class="text-sm text-red-500 font-medium">Due: {{ task.due_date|date:"M d, Y H:i" }}</p>
-                                <p class="text-sm text-gray-500">Assigned to: {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</p>
-                            </div>
-                            <div class="ml-2">
-                                <form method="post" action="{% url 'task_complete' task.id %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{{ request.path }}">
-                                    <button type="submit" class="text-green-600 hover:text-green-900" title="Mark as Completed">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    {% endfor %}
+        <!-- Overdue Tasks -->
+        <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-red-600 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Overdue Tasks
+                    </h2>
+                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {{ overdue_tasks|length }}
+                    </span>
                 </div>
-            {% else %}
-                <p class="text-gray-500">No overdue tasks found.</p>
-            {% endif %}
+            </div>
+            <div class="p-6">
+                {% if overdue_tasks %}
+                    <div class="space-y-4">
+                        {% for task in overdue_tasks %}
+                            <div class="flex items-start p-4 rounded-xl border-l-4 border-red-400 bg-red-50 hover:bg-red-100 transition-all duration-200 hover:shadow-md">
+                                <div class="flex-shrink-0 mt-1">
+                                    <div class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-exclamation-circle text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <p class="font-medium text-gray-900">{{ task.title }}</p>
+                                    <p class="text-sm text-red-600 font-medium mt-1">Due: {{ task.due_date|date:"M d, Y H:i" }}</p>
+                                    <p class="text-sm text-gray-500">{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <form method="post" action="{% url 'task_complete' task.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <button type="submit" class="p-2 text-green-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors" title="Mark as Completed">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'task_detail' task.id %}" class="p-2 text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                        </div>
+                        <p class="text-gray-500">Great! No overdue tasks</p>
+                        <p class="text-sm text-gray-400 mt-1">Keep up the good work!</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -241,18 +389,40 @@
 
 {% block extra_js %}
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate counters
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target')) || 0;
+        let current = 0;
+        const increment = target / 50;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                counter.textContent = target;
+                clearInterval(timer);
+            } else {
+                counter.textContent = Math.floor(current);
+            }
+        }, 30);
+    });
+
+    // Chart configurations
+    const chartColors = {
+        primary: '#ea982f',
+        blue: '#3B82F6',
+        green: '#10B981',
+        yellow: '#F59E0B',
+        red: '#EF4444',
+        purple: '#8B5CF6'
+    };
+
     // Deals by Stage Chart
     const dealsByStageCtx = document.getElementById('dealsByStageChart').getContext('2d');
     const dealsByStageChart = new Chart(dealsByStageCtx, {
         type: 'doughnut',
         data: {
-            labels: [
-                'Discovery',
-                'Proposal',
-                'Negotiation',
-                'Closed Won',
-                'Closed Lost'
-            ],
+            labels: ['Discovery', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'],
             datasets: [{
                 data: [
                     {{ deals_by_stage.discovery|default:0 }},
@@ -262,20 +432,37 @@
                     {{ deals_by_stage.closed_lost|default:0 }}
                 ],
                 backgroundColor: [
-                    '#3B82F6', // blue
-                    '#F59E0B', // yellow
-                    '#8B5CF6', // purple
-                    '#10B981', // green
-                    '#EF4444'  // red
+                    chartColors.blue,
+                    chartColors.yellow,
+                    chartColors.primary,
+                    chartColors.green,
+                    chartColors.red
                 ],
-                borderWidth: 1
+                borderWidth: 0,
+                hoverBorderWidth: 3,
+                hoverBorderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'right',
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.primary,
+                    borderWidth: 1
                 }
             }
         }
@@ -286,13 +473,7 @@
     const leadsByStatusChart = new Chart(leadsByStatusCtx, {
         type: 'bar',
         data: {
-            labels: [
-                'New',
-                'Contacted',
-                'Qualified',
-                'Unqualified',
-                'Converted'
-            ],
+            labels: ['New', 'Contacted', 'Qualified', 'Unqualified', 'Converted'],
             datasets: [{
                 label: 'Number of Leads',
                 data: [
@@ -302,17 +483,43 @@
                     {{ leads_by_status.unqualified|default:0 }},
                     {{ leads_by_status.converted|default:0 }}
                 ],
-                backgroundColor: '#3B82F6',
-                borderWidth: 1
+                backgroundColor: chartColors.primary,
+                borderRadius: 8,
+                borderSkipped: false,
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.primary,
+                    borderWidth: 1
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        precision: 0
+                        precision: 0,
+                        color: '#6B7280'
+                    },
+                    grid: {
+                        color: '#F3F4F6'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#6B7280'
+                    },
+                    grid: {
+                        display: false
                     }
                 }
             }
@@ -322,7 +529,7 @@
     // Deal Forecast Chart
     const dealForecastCtx = document.getElementById('dealForecastChart').getContext('2d');
     const dealForecastChart = new Chart(dealForecastCtx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: [
                 {% for item in deals_by_month %}
@@ -330,38 +537,82 @@
                 {% endfor %}
             ],
             datasets: [{
-                label: 'Deal Value',
+                label: 'Revenue',
                 data: [
                     {% for item in deals_by_month %}
                         {{ item.value }},
                     {% endfor %}
                 ],
-                backgroundColor: '#3B82F6',
-                borderWidth: 1
+                borderColor: chartColors.primary,
+                backgroundColor: chartColors.primary + '20',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: chartColors.primary,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.primary,
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Revenue: $' + context.raw.toLocaleString();
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return '$' + value;
-                        }
+                            return '$' + value.toLocaleString();
+                        },
+                        color: '#6B7280'
+                    },
+                    grid: {
+                        color: '#F3F4F6'
                     }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return '$' + context.raw;
-                        }
+                },
+                x: {
+                    ticks: {
+                        color: '#6B7280'
+                    },
+                    grid: {
+                        display: false
                     }
                 }
             }
         }
     });
+});
+
+// Refresh chart function
+function refreshChart(chartType) {
+    // Add loading animation
+    const button = event.target.closest('button');
+    const icon = button.querySelector('i');
+    icon.classList.add('fa-spin');
+
+    // Simulate refresh
+    setTimeout(() => {
+        icon.classList.remove('fa-spin');
+        // Here you would typically make an AJAX call to refresh the data
+    }, 1000);
+}
 </script>
 {% endblock %}

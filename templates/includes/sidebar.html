@@ -1,42 +1,470 @@
-<aside class="w-64 bg-white shadow-md">
-    <div class="h-full px-3 py-4 overflow-y-auto">
-        <ul class="space-y-2">
-            <li>
-                <a href="{% url 'dashboard' %}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 {% if request.path == '/dashboard/' or request.path == '/' %}bg-gray-100{% endif %}">
-                    <i class="fas fa-tachometer-alt w-6 h-6 text-gray-500"></i>
-                    <span class="ml-3">Dashboard</span>
+<aside class="sidebar w-64 bg-white shadow-soft h-full flex flex-col transition-all duration-300 ease-in-out" id="main-sidebar">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-100 md:hidden">
+        <a href="{% url 'dashboard' %}" class="flex items-center">
+            <div class="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center mr-2">
+                <i class="fas fa-chart-line text-white text-sm"></i>
+            </div>
+            <span class="text-xl font-bold text-primary-500 sidebar-text">CRM System</span>
+        </a>
+        <button id="close-sidebar" class="text-gray-500 hover:text-primary-500 transition-colors duration-200 p-1 rounded-md hover:bg-primary-50">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+
+    <!-- User Profile (Mobile) -->
+    <div class="flex items-center space-x-3 p-4 border-b border-gray-100 md:hidden bg-gradient-to-r from-primary-50 to-orange-50">
+        {% if user.profile.profile_image and user.profile.profile_image.url %}
+            <img class="h-12 w-12 rounded-full object-cover shadow-md border-2 border-primary-200"
+                 src="{{ user.profile.profile_image.url }}"
+                 alt="{{ user.username }}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        {% endif %}
+
+        <div class="h-12 w-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white flex items-center justify-center font-semibold shadow-md"
+             style="display: {% if user.profile.profile_image and user.profile.profile_image.url %}none{% else %}flex{% endif %};">
+            {{ user.username|first|upper }}
+        </div>
+
+        <div class="flex-1 min-w-0 sidebar-text">
+            <p class="font-medium text-gray-900 truncate">{{ user.get_full_name|default:user.username }}</p>
+            <p class="text-sm text-gray-500 truncate">{{ user.email }}</p>
+            <div class="flex items-center mt-1">
+                <div class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                <span class="text-xs text-gray-500">Online</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex-1 px-3 py-4 overflow-y-auto">
+        <!-- Sidebar Toggle -->
+        <div class="hidden md:flex justify-end mb-4">
+            <button id="sidebar-collapse" class="text-gray-400 hover:text-primary-500 transition-colors duration-200 p-2 rounded-lg hover:bg-primary-50" title="Toggle sidebar">
+                <i class="fas fa-angle-double-left text-sm transition-transform duration-300"></i>
+            </button>
+        </div>
+
+        <!-- Main Navigation -->
+        <nav class="space-y-1">
+            <div class="mb-6">
+                <h3 class="sidebar-header px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Main Menu</h3>
+
+                <a href="{% url 'dashboard' %}" class="sidebar-item group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.path == '/dashboard/' or request.path == '/' %}bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-600{% endif %}">
+                    <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl {% if request.path == '/dashboard/' or request.path == '/' %}bg-white bg-opacity-20 text-white{% else %}bg-gray-100 text-gray-500 group-hover:bg-primary-100 group-hover:text-primary-500{% endif %} transition-all duration-200">
+                        <i class="fas fa-tachometer-alt text-lg"></i>
+                    </div>
+                    <span class="sidebar-text ml-3 flex-1">Dashboard</span>
+                    {% if request.path == '/dashboard/' or request.path == '/' %}
+                        <div class="sidebar-text w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    {% endif %}
                 </a>
-            </li>
-            <li>
-                <a href="{% url 'contact_list' %}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 {% if '/contacts/' in request.path %}bg-gray-100{% endif %}">
-                    <i class="fas fa-address-book w-6 h-6 text-gray-500"></i>
-                    <span class="ml-3">Contacts</span>
+
+                <a href="{% url 'contact_list' %}" class="sidebar-item group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if '/contacts/' in request.path %}bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-600{% endif %}">
+                    <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl {% if '/contacts/' in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-gray-100 text-gray-500 group-hover:bg-primary-100 group-hover:text-primary-500{% endif %} transition-all duration-200">
+                        <i class="fas fa-address-book text-lg"></i>
+                    </div>
+                    <span class="sidebar-text ml-3 flex-1">Contacts</span>
+                    <div class="sidebar-badge flex flex-col items-center">
+                        <span class="{% if '/contacts/' in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-primary-100 text-primary-600{% endif %} text-sm font-bold px-2.5 py-1 rounded-lg counter shadow-sm" data-target="0">0</span>
+                        <span class="sidebar-text text-xs text-gray-400 mt-0.5">total</span>
+                    </div>
                 </a>
-            </li>
-            <li>
-                <a href="{% url 'lead_list' %}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 {% if '/leads/' in request.path %}bg-gray-100{% endif %}">
-                    <i class="fas fa-user-tag w-6 h-6 text-gray-500"></i>
-                    <span class="ml-3">Leads</span>
+
+                <a href="{% url 'lead_list' %}" class="sidebar-item group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if '/leads/' in request.path %}bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-600{% endif %}">
+                    <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl {% if '/leads/' in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-gray-100 text-gray-500 group-hover:bg-primary-100 group-hover:text-primary-500{% endif %} transition-all duration-200">
+                        <i class="fas fa-user-tag text-lg"></i>
+                    </div>
+                    <span class="sidebar-text ml-3 flex-1">Leads</span>
+                    <div class="sidebar-badge flex flex-col items-center">
+                        <span class="{% if '/leads/' in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-yellow-100 text-yellow-700{% endif %} text-sm font-bold px-2.5 py-1 rounded-lg counter shadow-sm" data-target="0">0</span>
+                        <span class="sidebar-text text-xs text-gray-400 mt-0.5">active</span>
+                    </div>
                 </a>
-            </li>
-            <li>
-                <a href="{% url 'deal_list' %}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 {% if '/deals/' in request.path and '/kanban/' not in request.path %}bg-gray-100{% endif %}">
-                    <i class="fas fa-handshake w-6 h-6 text-gray-500"></i>
-                    <span class="ml-3">Deals</span>
+
+                <a href="{% url 'deal_list' %}" class="sidebar-item group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if '/deals/' in request.path and '/kanban/' not in request.path %}bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-600{% endif %}">
+                    <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl {% if '/deals/' in request.path and '/kanban/' not in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-gray-100 text-gray-500 group-hover:bg-primary-100 group-hover:text-primary-500{% endif %} transition-all duration-200">
+                        <i class="fas fa-handshake text-lg"></i>
+                    </div>
+                    <span class="sidebar-text ml-3 flex-1">Deals</span>
+                    <div class="sidebar-badge flex flex-col items-center">
+                        <span class="{% if '/deals/' in request.path and '/kanban/' not in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-green-100 text-green-700{% endif %} text-sm font-bold px-2.5 py-1 rounded-lg counter shadow-sm" data-target="0">0</span>
+                        <span class="sidebar-text text-xs text-gray-400 mt-0.5">open</span>
+                    </div>
                 </a>
-            </li>
-            <li>
-                <a href="{% url 'task_list' %}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 {% if '/tasks/' in request.path %}bg-gray-100{% endif %}">
-                    <i class="fas fa-tasks w-6 h-6 text-gray-500"></i>
-                    <span class="ml-3">Tasks</span>
+
+                <a href="{% url 'task_list' %}" class="sidebar-item group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if '/tasks/' in request.path %}bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-600{% endif %}">
+                    <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl {% if '/tasks/' in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-gray-100 text-gray-500 group-hover:bg-primary-100 group-hover:text-primary-500{% endif %} transition-all duration-200">
+                        <i class="fas fa-tasks text-lg"></i>
+                    </div>
+                    <span class="sidebar-text ml-3 flex-1">Tasks</span>
+                    <div class="sidebar-badge flex flex-col items-center">
+                        <span class="{% if '/tasks/' in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-red-100 text-red-700{% endif %} text-sm font-bold px-2.5 py-1 rounded-lg counter shadow-sm" data-target="0">0</span>
+                        <span class="sidebar-text text-xs text-gray-400 mt-0.5">pending</span>
+                    </div>
                 </a>
-            </li>
-            <li>
-                <a href="{% url 'profile' %}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 {% if '/accounts/profile/' in request.path %}bg-gray-100{% endif %}">
-                    <i class="fas fa-user-cog w-6 h-6 text-gray-500"></i>
-                    <span class="ml-3">Settings</span>
+            </div>
+
+            <!-- Account Section -->
+            <div class="mb-6">
+                <h3 class="sidebar-header px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Account</h3>
+
+                <a href="{% url 'profile' %}" class="sidebar-item group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if '/accounts/profile/' in request.path %}bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-600{% endif %}">
+                    <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl {% if '/accounts/profile/' in request.path %}bg-white bg-opacity-20 text-white{% else %}bg-gray-100 text-gray-500 group-hover:bg-primary-100 group-hover:text-primary-500{% endif %} transition-all duration-200">
+                        <i class="fas fa-user-circle text-lg"></i>
+                    </div>
+                    <span class="sidebar-text ml-3 flex-1">Profile</span>
+                    {% if '/accounts/profile/' in request.path %}
+                        <div class="sidebar-text w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    {% endif %}
                 </a>
-            </li>
-        </ul>
+
+                <a href="{% url 'logout' %}" class="sidebar-item group flex items-center px-3 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+                    <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 group-hover:bg-red-100 group-hover:text-red-500 transition-all duration-200">
+                        <i class="fas fa-sign-out-alt text-lg"></i>
+                    </div>
+                    <span class="sidebar-text ml-3 flex-1">Logout</span>
+                    <i class="sidebar-text fas fa-external-link-alt text-xs text-gray-400 group-hover:text-red-400"></i>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Bottom Section - KPI Dashboard -->
+    <div class="sidebar-bottom p-4 border-t border-gray-100 bg-gradient-to-br from-gray-50 to-gray-100">
+        <!-- Monthly Goal Progress -->
+        <div class="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl p-4 text-white mb-4 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="sidebar-text font-semibold text-sm flex items-center">
+                    <i class="fas fa-target mr-2"></i>
+                    Monthly Goal
+                </h4>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full font-medium">75%</span>
+                    <div class="goal-icon w-6 h-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-line text-xs"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full bg-white bg-opacity-20 rounded-full h-3 mb-3 overflow-hidden">
+                <div class="bg-white h-3 rounded-full transition-all duration-1000 ease-out shadow-sm" style="width: 75%"></div>
+            </div>
+            <div class="sidebar-text flex items-center justify-between text-sm">
+                <span class="font-medium">
+                    $<span class="counter text-lg" data-target="75000">75,000</span>
+                </span>
+                <span class="opacity-90">of $100,000</span>
+            </div>
+            <div class="sidebar-text flex items-center justify-between mt-2 text-xs opacity-90">
+                <span class="flex items-center">
+                    <i class="fas fa-calendar-alt mr-1"></i>
+                    15 days left
+                </span>
+                <span class="flex items-center font-medium">
+                    <i class="fas fa-arrow-up mr-1 text-green-300"></i> On track
+                </span>
+            </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid space-y-3">
+            <!-- Today's Performance -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-md">
+                            <i class="fas fa-calendar-day text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="sidebar-text text-xs font-medium text-gray-500 uppercase tracking-wide">Today's Tasks</p>
+                            <p class="text-2xl font-bold text-gray-900 counter leading-none" data-target="8">8</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mb-1">
+                            <span class="text-green-600 font-bold text-sm counter" data-target="5">5</span>
+                        </div>
+                        <span class="sidebar-text text-xs text-gray-500">done</span>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-1000" style="width: 62%"></div>
+                </div>
+            </div>
+
+            <!-- Hot Leads -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-xl flex items-center justify-center mr-3 shadow-md">
+                            <i class="fas fa-fire text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="sidebar-text text-xs font-medium text-gray-500 uppercase tracking-wide">Hot Leads</p>
+                            <p class="text-2xl font-bold text-gray-900 counter leading-none" data-target="12">12</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mb-1">
+                            <span class="text-red-600 font-bold text-sm counter" data-target="3">3</span>
+                        </div>
+                        <span class="sidebar-text text-xs text-gray-500">urgent</span>
+                    </div>
+                </div>
+                <div class="sidebar-text flex items-center text-xs text-gray-600">
+                    <i class="fas fa-clock mr-1 text-red-500"></i>
+                    <span>4 contacted today</span>
+                </div>
+            </div>
+
+            <!-- Revenue Metrics -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 border border-green-100 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-trophy text-green-600 text-sm"></i>
+                        </div>
+                        <span class="text-lg font-bold text-green-600 counter" data-target="23">23</span>
+                    </div>
+                    <p class="sidebar-text text-xs font-medium text-green-700">Deals Won</p>
+                    <p class="sidebar-text text-xs text-green-600 mt-1">
+                        $<span class="counter font-medium" data-target="45000">45,000</span>
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-3 border border-purple-100 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-phone text-purple-600 text-sm"></i>
+                        </div>
+                        <span class="text-lg font-bold text-purple-600 counter" data-target="34">34</span>
+                    </div>
+                    <p class="sidebar-text text-xs font-medium text-purple-700">Calls Made</p>
+                    <p class="sidebar-text text-xs text-purple-600 mt-1">
+                        <span class="counter font-medium" data-target="156">156</span> this week
+                    </p>
+                </div>
+            </div>
+
+            <!-- Conversion Rate -->
+            <div class="bg-gradient-to-r from-primary-50 to-orange-50 rounded-xl p-3 border border-primary-100">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-percentage text-primary-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="sidebar-text text-xs font-medium text-primary-700">Conversion Rate</p>
+                            <p class="text-lg font-bold text-primary-600">24%</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="sidebar-text text-xs text-primary-600 flex items-center">
+                            <i class="fas fa-arrow-up mr-1 text-green-500"></i>
+                            <span class="text-green-600">+3%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </aside>
+
+<style>
+/* Sidebar Styles */
+.sidebar {
+    min-height: 100vh;
+    position: relative;
+}
+
+.sidebar.collapsed {
+    width: 4rem !important;
+}
+
+.sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-header {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-badge {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-bottom {
+    padding: 1rem 0.5rem;
+}
+
+.sidebar.collapsed .kpi-grid {
+    display: none;
+}
+
+.sidebar.collapsed .goal-icon {
+    display: block;
+}
+
+.sidebar.collapsed .sidebar-item {
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+.sidebar.collapsed .sidebar-item > div:first-child {
+    margin: 0;
+}
+
+/* Tooltip for collapsed state */
+.sidebar.collapsed .sidebar-item {
+    position: relative;
+}
+
+.sidebar.collapsed .sidebar-item:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-left: 0.5rem;
+}
+
+/* Counter animations */
+@keyframes countUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.counter {
+    animation: countUp 0.6s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        z-index: 50;
+        transition: left 0.3s ease-in-out;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+}
+
+/* Hover effects */
+.sidebar-item:hover {
+    transform: translateX(2px);
+}
+
+.sidebar.collapsed .sidebar-item:hover {
+    transform: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('main-sidebar');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    const collapseBtn = document.getElementById('sidebar-collapse');
+
+    // Add tooltips for collapsed state
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    sidebarItems.forEach(item => {
+        const text = item.querySelector('.sidebar-text');
+        if (text) {
+            item.setAttribute('data-tooltip', text.textContent.trim());
+        }
+    });
+
+    // Close sidebar functionality (mobile)
+    if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            document.body.classList.remove('overflow-hidden');
+        });
+    }
+
+    // Sidebar collapse functionality (desktop)
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+
+            // Rotate the collapse icon
+            const icon = collapseBtn.querySelector('i');
+            icon.classList.toggle('fa-angle-double-left');
+            icon.classList.toggle('fa-angle-double-right');
+
+            // Save state to localStorage
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+
+        // Restore sidebar state
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+            const icon = collapseBtn.querySelector('i');
+            icon.classList.remove('fa-angle-double-left');
+            icon.classList.add('fa-angle-double-right');
+        }
+    }
+
+    // Enhanced counter animation
+    function animateCounter(element, target, duration = 2000) {
+        const start = 0;
+        const startTime = performance.now();
+
+        function updateCounter(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Easing function for smooth animation
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const current = Math.floor(start + (target - start) * easeOutQuart);
+
+            element.textContent = current.toLocaleString();
+
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            } else {
+                element.textContent = target.toLocaleString();
+            }
+        }
+
+        requestAnimationFrame(updateCounter);
+    }
+
+    // Animate all counters with staggered timing
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach((counter, index) => {
+        const target = parseInt(counter.getAttribute('data-target')) || 0;
+        setTimeout(() => {
+            animateCounter(counter, target);
+        }, index * 200);
+    });
+
+    // Enhanced hover effects
+    sidebarItems.forEach(item => {
+        if (!item.classList.contains('bg-gradient-to-r')) {
+            item.addEventListener('mouseenter', function() {
+                if (!sidebar.classList.contains('collapsed')) {
+                    this.style.transform = 'translateX(4px)';
+                    this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                }
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+                this.style.boxShadow = 'none';
+            });
+        }
+    });
+});
+</script>

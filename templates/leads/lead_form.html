@@ -1,52 +1,301 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
 
-{% block title %}{{ action }} Lead - CRM System{% endblock %}
+{% block title %}
+    {% if form.instance.pk %}Edit Lead{% else %}Create Lead{% endif %} - CRM System
+{% endblock %}
+
+{% block breadcrumb %}
+<nav class="flex" aria-label="Breadcrumb">
+    <ol class="flex items-center space-x-4">
+        <li>
+            <a href="{% url 'lead_list' %}" class="text-gray-500 hover:text-gray-700">Leads</a>
+        </li>
+        <li>
+            <i class="fas fa-chevron-right text-gray-400"></i>
+        </li>
+        <li>
+            <span class="text-gray-900 font-medium">
+                {% if form.instance.pk %}Edit Lead{% else %}Create Lead{% endif %}
+            </span>
+        </li>
+    </ol>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">{{ action }} Lead</h1>
-        <a href="{% if lead %}{% url 'lead_detail' lead.id %}{% else %}{% url 'lead_list' %}{% endif %}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md">
-            <i class="fas fa-arrow-left mr-2"></i> Back
-        </a>
-    </div>
-    
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="p-6">
-            <form method="post">
-                {% csrf_token %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        {{ form.contact|as_crispy_field }}
-                    </div>
-                    <div>
-                        {{ form.title|as_crispy_field }}
-                    </div>
-                    <div class="md:col-span-2">
-                        {{ form.description|as_crispy_field }}
-                    </div>
-                    <div>
-                        {{ form.status|as_crispy_field }}
-                    </div>
-                    <div>
-                        {{ form.priority|as_crispy_field }}
-                    </div>
-                    <div>
-                        {{ form.estimated_value|as_crispy_field }}
-                    </div>
-                    <div>
-                        {{ form.assigned_to|as_crispy_field }}
-                    </div>
-                </div>
-                
-                <div class="mt-6 flex justify-end">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md">
-                        Save Lead
-                    </button>
-                </div>
-            </form>
+<div class="container mx-auto max-w-4xl space-y-6">
+    <!-- Header Section -->
+    <div class="text-center">
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <i class="fas fa-user-plus text-white text-2xl"></i>
         </div>
+        <h1 class="text-3xl font-bold text-gray-900">
+            {% if form.instance.pk %}Edit Lead{% else %}Create New Lead{% endif %}
+        </h1>
+        <p class="text-gray-600 mt-2">
+            {% if form.instance.pk %}
+                Update lead information and track progress
+            {% else %}
+                Add a new potential opportunity to your pipeline
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+        <div class="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <h2 class="text-xl font-bold flex items-center">
+                <i class="fas fa-edit mr-3"></i>
+                Lead Information
+            </h2>
+        </div>
+
+        <form method="post" class="p-8 space-y-8">
+            {% csrf_token %}
+
+            <!-- Display form errors -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
+                        <div class="text-red-700">
+                            {{ form.non_field_errors }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Basic Information Section -->
+            <div class="space-y-6">
+                <div class="border-b border-gray-200 pb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                        Basic Information
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Contact -->
+                    <div>
+                        <label for="{{ form.contact.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Contact <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="{{ form.contact.name }}"
+                                    id="{{ form.contact.id_for_label }}"
+                                    class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {% if form.contact.errors %}border-red-500{% endif %}">
+                                <option value="">Select a contact</option>
+                                {% for contact in form.contact.field.queryset %}
+                                    <option value="{{ contact.id }}" {% if form.contact.value == contact.id %}selected{% endif %}>
+                                        {{ contact.first_name }} {{ contact.last_name }} - {{ contact.company|default:"No company" }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                        </div>
+                        {% if form.contact.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.contact.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Lead Title -->
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Lead Title <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text"
+                                   name="{{ form.title.name }}"
+                                   id="{{ form.title.id_for_label }}"
+                                   value="{{ form.title.value|default:'' }}"
+                                   class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {% if form.title.errors %}border-red-500{% endif %}"
+                                   placeholder="Enter lead title">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                                <i class="fas fa-tag text-gray-400"></i>
+                            </div>
+                        </div>
+                        {% if form.title.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lead Details Section -->
+            <div class="space-y-6">
+                <div class="border-b border-gray-200 pb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-chart-line text-blue-500 mr-2"></i>
+                        Lead Details
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Status -->
+                    <div>
+                        <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Status <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="{{ form.status.name }}"
+                                    id="{{ form.status.id_for_label }}"
+                                    class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {% if form.status.errors %}border-red-500{% endif %}">
+                                {% for value, label in form.status.field.choices %}
+                                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                                <i class="fas fa-flag text-gray-400"></i>
+                            </div>
+                        </div>
+                        {% if form.status.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.status.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Priority -->
+                    <div>
+                        <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Priority <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="{{ form.priority.name }}"
+                                    id="{{ form.priority.id_for_label }}"
+                                    class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {% if form.priority.errors %}border-red-500{% endif %}">
+                                {% for value, label in form.priority.field.choices %}
+                                    <option value="{{ value }}" {% if form.priority.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                                <i class="fas fa-exclamation-triangle text-gray-400"></i>
+                            </div>
+                        </div>
+                        {% if form.priority.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.priority.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Estimated Value -->
+                    <div>
+                        <label for="{{ form.estimated_value.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Estimated Value
+                        </label>
+                        <div class="relative">
+                            <input type="number"
+                                   name="{{ form.estimated_value.name }}"
+                                   id="{{ form.estimated_value.id_for_label }}"
+                                   value="{{ form.estimated_value.value|default:'' }}"
+                                   step="0.01"
+                                   class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {% if form.estimated_value.errors %}border-red-500{% endif %}"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                                <i class="fas fa-dollar-sign text-gray-400"></i>
+                            </div>
+                        </div>
+                        {% if form.estimated_value.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.estimated_value.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+                    <!-- Assigned To -->
+                    <div>
+                        <label for="{{ form.assigned_to.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Assigned To
+                        </label>
+                        <div class="relative">
+                            <select name="{{ form.assigned_to.name }}"
+                                    id="{{ form.assigned_to.id_for_label }}"
+                                    class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                                <option value="">Select assignee</option>
+                                {% for user in form.assigned_to.field.queryset %}
+                                    <option value="{{ user.id }}" {% if form.assigned_to.value == user.id %}selected{% endif %}>
+                                        {{ user.get_full_name|default:user.username }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                                <i class="fas fa-user-check text-gray-400"></i>
+                            </div>
+                        </div>
+                        {% if form.assigned_to.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.assigned_to.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description Section -->
+            <div class="space-y-6">
+                <div class="border-b border-gray-200 pb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+                        Description
+                    </h3>
+                </div>
+
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Lead Description
+                    </label>
+                    <textarea name="{{ form.description.name }}"
+                              id="{{ form.description.id_for_label }}"
+                              rows="6"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {% if form.description.errors %}border-red-500{% endif %}"
+                              placeholder="Describe the lead opportunity, requirements, and any relevant details...">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-8 border-t border-gray-200">
+                <a href="{% url 'lead_list' %}"
+                   class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                    <i class="fas fa-times mr-2"></i> Cancel
+                </a>
+                <button type="submit"
+                        class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <i class="fas fa-save mr-2"></i>
+                    {% if form.instance.pk %}Update Lead{% else %}Create Lead{% endif %}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('border-red-500');
+            } else {
+                field.classList.remove('border-red-500');
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+        }
+    });
+});
+</script>
 {% endblock %}

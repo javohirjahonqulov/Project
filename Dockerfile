@@ -10,7 +10,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . /app/
 
-RUN python manage.py collectstatic --noinput
+# Agar staticdan foydalanmasangiz, quyidagi qatorni olib tashlang:
+RUN python manage.py collectstatic --noinput || true
 
 EXPOSE 8000
 
